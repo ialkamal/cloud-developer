@@ -1,16 +1,18 @@
+require("dotenv").config();
+
 export const config = {
   dev: {
-    username: "postgres_ismail",
-    password: "postgres_ismail",
-    database: "postgres_ismail",
-    host: "postgres-ismail.comcxmlcotuc.us-east-1.rds.amazonaws.com",
-    dialect: "postgres",
-    aws_region: "us-east-1",
-    aws_profile: "default",
-    aws_media_bucket: "udacity-cloud-ismail-2022",
+    username: process.env.DEV_DATABASE_USERNAME,
+    password: process.env.DEV_DATABASE_PASSWORD,
+    database: process.env.DEV_DATABASE_NAME,
+    host: process.env.DEV_DATABASE_HOST,
+    dialect: process.env.DEV_DATABASE_DIALECT,
+    aws_region: process.env.AWS_REGION,
+    aws_profile: process.env.AWS_PROFILE,
+    aws_media_bucket: process.env.AWS_MEDIA_BUCKET,
   },
   jwt: {
-    secret: "twisttwist",
+    secret: process.env.JWT_SECRET,
   },
   prod: {
     username: "",
