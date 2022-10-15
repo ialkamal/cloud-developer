@@ -18,11 +18,43 @@ router.get("/", async (req: Request, res: Response) => {
 
 //@TODO
 //Add an endpoint to GET a specific resource by Primary Key
+router.get("/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (!id) return res.status(400).send({ err: "there must be an id." });
+
+  const item = await FeedItem.findByPk(id);
+
+  if (!item)
+    return res.status(404).send({ err: `Item with id:${id} does not exist.` });
+
+  res.status(200).send(item);
+});
 
 // update a specific resource
 router.patch("/:id", requireAuth, async (req: Request, res: Response) => {
   //@TODO try it yourself
-  res.status(500).send("not implemented");
+  const { id } = req.params;
+  const { caption, url } = req.body;
+
+  if (!id) return res.status(400).send({ err: "there must be an id." });
+
+  if (!caption || !url)
+    return res.status(400).send({ err: "Caption or URL can't be empty." });
+
+  const item = await FeedItem.findByPk(id);
+
+  if (!item)
+    return res.status(404).send({ err: `Item with id:${id} does not exist.` });
+
+  const updatedItem = await FeedItem.update(
+    { caption, url },
+    { where: { id } }
+  );
+
+  res.status(200).send(updatedItem);
+
+  //res.status(500).send("not implemented");
 });
 
 // Get a signed url to put a new item in the bucket
@@ -40,8 +72,11 @@ router.get(
 // NOTE the file name is they key name in the s3 bucket.
 // body : {caption: string, fileName: string};
 router.post("/", requireAuth, async (req: Request, res: Response) => {
-  const caption = req.body.caption.toString;
+  const caption = req.body.caption.toString();
   const fileName = req.body.url;
+
+  console.log("CAPTION: ", caption);
+  console.log("FILENAME: ", fileName);
 
   // check Caption is valid
   if (!caption) {
@@ -61,6 +96,8 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
   });
 
   const saved_item = await item.save();
+
+  console.log("SAVED ITEM: ", saved_item);
 
   saved_item.url = AWS.getGetSignedUrl(saved_item.url);
   res.status(201).send(saved_item);
